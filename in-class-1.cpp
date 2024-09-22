@@ -1,0 +1,298 @@
+#include <iostream>
+using namespace std;
+
+struct Node {
+    int data;
+    Node* next;
+};
+
+typedef Node* node;
+
+// Function prototypes
+void menu(node, node, int);
+node makeNode(int);
+void insertLast(node&, int);
+void print(node);
+node findMiddle(node);
+bool detectCycle(node);
+node mergeSortedLists(node, node);
+node findIntersection(node, node);
+node reverseList(node);
+void removeDuplicates(node);
+bool isPalindrome(node);
+void searchNode(node, int);
+
+int main() {
+    node head1 = nullptr;
+    node head2 = nullptr;
+    int x, n1, n2;
+
+    // Input list 1
+    cout << "== Input List 1 ==" << endl;
+    cout << "Number of nodes: ";  
+    cin >> n1;
+    cout << "Input List 1: ";
+    while (n1--) {
+        cin >> x;
+        if (x == 0) { break; }
+        insertLast(head1, x);
+    }
+    cout << "List 1: ";  
+    print(head1);  
+    cout << endl;
+
+    menu(head1, head2,x);
+}
+
+// Menu function
+void menu(node head1, node head2, int x) {
+    int choice;
+    do {
+        cout << "===== MENU =====" << endl;
+        cout << "0. Exit." << endl;
+        cout << "1. Find the middle node of the list." << endl;
+        cout << "2. Detect a cycle in a linked list." << endl;
+        cout << "3. Combine Two Sorted Linked Lists." << endl;
+        cout << "4. Find the Intersection of Two Linked Lists." << endl;
+        cout << "5. Reverse a Linked List." << endl;
+        cout << "6. Eliminate Duplicates from a Sorted Linked List." << endl;
+        cout << "7. Check if a Linked List is a Palindrome." << endl;
+        cout << "8. Search for nodes with the value X in the list." << endl;
+        cout << "Choose a number 0-8: ";  
+        cin >> choice;
+
+        switch (choice) {
+            case 0: break;
+            case 1: {
+                node mid = findMiddle(head1);
+                if (mid) {
+                    cout << "The middle node: " << mid->data << endl;
+                } else {
+                    cout << "List is empty." << endl;
+                }
+                break;
+            }
+            case 2:
+                cout << (detectCycle(head1) ? "List has a cycle." : "List doesn't have a cycle.") << endl;
+                break;
+            case 3: {
+                node mergedList = mergeSortedLists(head1, head2);
+                cout << "Merged List: ";  
+                print(mergedList);  
+                break;
+            }
+            case 4: {
+                node intersection = findIntersection(head1, head2);
+                if (intersection) {
+                    cout << "Intersection at node with value: " << intersection->data << endl;
+                } else {
+                    cout << "No intersection" << endl;
+                }
+                break;
+            }
+            case 5: {
+                node reversed = reverseList(head1);
+                cout << "Reversed List: ";  
+                print(reversed);  
+                break;
+            }
+            case 6:
+                removeDuplicates(head1);
+                cout << "List after removing duplicates: ";  
+                print(head1);  
+                break;
+            case 7:
+                cout << (isPalindrome(head1) ? "The list is Palindrome." : "The list is not Palindrome.") << endl;
+                break;
+            case 8:
+                cout << "Enter value to search: ";  
+                cin >> x;
+                searchNode(head1, x);
+                break;
+        }
+    } while (choice != 0);
+}
+
+// Create a new node
+node makeNode(int x) {
+    node tmp = new Node();
+    tmp->data = x;
+    tmp->next = nullptr;
+    return tmp;
+}
+
+// Insert a new node at the end of the list
+void insertLast(node &head, int x) {
+    node tmp = makeNode(x);
+    if (head == nullptr) {
+        head = tmp;
+    } else {
+        node p = head;
+        while (p->next != nullptr) {
+            p = p->next;
+        }
+        p->next = tmp;
+    }
+}
+
+// Print list
+void print(node head) {
+    if (head == nullptr) {
+        cout << "Empty list.";
+    } else {
+        node p = head;
+        while (p != nullptr) {
+            cout << p->data << " ";
+            p = p->next;
+        }
+    }
+    cout << endl;
+}
+
+// Find the middle node of a linked list
+node findMiddle(node head) {
+    if (head == nullptr) return nullptr;
+    node p1 = head, p2 = head;
+    while (p1 != nullptr && p1->next != nullptr) {
+        p2 = p2->next;
+        p1 = p1->next->next;
+    }
+    return p2;
+}
+
+// Detect a cycle in a linked list
+bool detectCycle(node head) {
+    if (head == nullptr) return false;
+    node slow = head, fast = head;
+    while (fast != nullptr && fast->next != nullptr) {
+        slow = slow->next;
+        fast = fast->next->next;
+        if (slow == fast) {
+            return true; // Cycle detected
+        }
+    }
+    return false; // No cycle
+}
+
+// Combine two sorted linked lists
+node mergeSortedLists(node l1, node l2) {
+    if (l1 == nullptr) return l2;
+    if (l2 == nullptr) return l1;
+
+    if (l1->data < l2->data) {
+        l1->next = mergeSortedLists(l1->next, l2);
+        return l1;
+    } else {
+        l2->next = mergeSortedLists(l1, l2->next);
+        return l2;
+    }
+}
+
+// Find the intersection of two linked lists
+node findIntersection(node head1, node head2) {
+    if (head1 == nullptr || head2 == nullptr) return nullptr;
+    node a = head1;
+    node b = head2;
+    int len1 = 0, len2 = 0;
+
+    while (a) {
+        len1++;
+        a = a->next;
+    }
+    while (b) {
+        len2++;
+        b = b->next;
+    }
+
+    a = head1;
+    b = head2;
+
+    if (len1 > len2) {
+        for (int i = 0; i < len1 - len2; i++) a = a->next;
+    } else {
+        for (int i = 0; i < len2 - len1; i++) b = b->next;
+    }
+
+    while (a && b) {
+        if (a == b) {
+            return a; // Intersection point
+        }
+        a = a->next;
+        b = b->next;
+    }
+    return nullptr; // No intersection
+}
+
+// Reverse a linked list
+node reverseList(node head) {
+    node prev = nullptr, curr = head;
+    while (curr != nullptr) {
+        node next = curr->next;
+        curr->next = prev;
+        prev = curr;
+        curr = next;
+    }
+    return prev;
+}
+
+// Eliminate duplicates from a sorted linked list
+void removeDuplicates(node head) {
+    if (head == nullptr) return;
+    node current = head;
+    while (current->next != nullptr) {
+        if (current->data == current->next->data) {
+            node temp = current->next;
+            current->next = current->next->next;
+            delete temp; // Free the memory
+        } else {
+            current = current->next;
+        }
+    }
+}
+
+// Check if a linked list is a palindrome
+bool isPalindrome(node head) {
+    if (head == nullptr || head->next == nullptr) return true;
+    node p2 = head, p1 = head;
+    while (p1->next != nullptr && p1->next->next != nullptr) {
+        p2 = p2->next;
+        p1 = p1->next->next;
+    }
+
+    node prev = nullptr, curr = p2->next;
+    while (curr != nullptr) {
+        node next = curr->next;
+        curr->next = prev;
+        prev = curr;
+        curr = next;
+    }
+
+    node left = head, right = prev;
+    while (right != nullptr) {
+        if (left->data != right->data) return false;
+        left = left->next;
+        right = right->next;
+    }
+    return true;
+}
+
+// Search for nodes with the value X in the list
+void searchNode(node head1, int x) {
+        Node* curr = head1;
+        bool found = false;
+
+        cout << "The node value " << x << ": ";
+        while (curr != nullptr) {
+            if (curr->data == x) {
+                found = true;
+                cout << curr << " ";
+            }
+            curr = curr->next;
+        }
+
+        if (!found) {
+            cout << "NULL";
+        }
+
+        cout << endl;
+    }
