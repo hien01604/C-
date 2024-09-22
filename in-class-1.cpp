@@ -2,7 +2,7 @@
 using namespace std;
 
 struct Node {
-    int data;
+    int x;
     Node* next;
 };
 
@@ -41,6 +41,20 @@ int main() {
     print(head1);  
     cout << endl;
 
+    // Input list 2
+    cout << "== Input List 2 ==" << endl;
+    cout << "Number of nodes: ";  
+    cin >> n1;
+    cout << "Input List 2: ";
+    while (n1--) {
+        cin >> x;
+        if (x == 0) { break; }
+        insertLast(head1, x);
+    }
+    cout << "List 2: ";  
+    print(head2);  
+    cout << endl;
+
     menu(head1, head2,x);
 }
 
@@ -66,7 +80,7 @@ void menu(node head1, node head2, int x) {
             case 1: {
                 node mid = findMiddle(head1);
                 if (mid) {
-                    cout << "The middle node: " << mid->data << endl;
+                    cout << "The middle node: " << mid->x << endl;
                 } else {
                     cout << "List is empty." << endl;
                 }
@@ -76,6 +90,7 @@ void menu(node head1, node head2, int x) {
                 cout << (detectCycle(head1) ? "List has a cycle." : "List doesn't have a cycle.") << endl;
                 break;
             case 3: {
+                
                 node mergedList = mergeSortedLists(head1, head2);
                 cout << "Merged List: ";  
                 print(mergedList);  
@@ -84,7 +99,7 @@ void menu(node head1, node head2, int x) {
             case 4: {
                 node intersection = findIntersection(head1, head2);
                 if (intersection) {
-                    cout << "Intersection at node with value: " << intersection->data << endl;
+                    cout << "Intersection at node with value: " << intersection->x << endl;
                 } else {
                     cout << "No intersection" << endl;
                 }
@@ -116,7 +131,7 @@ void menu(node head1, node head2, int x) {
 // Create a new node
 node makeNode(int x) {
     node tmp = new Node();
-    tmp->data = x;
+    tmp->x = x;
     tmp->next = nullptr;
     return tmp;
 }
@@ -142,7 +157,7 @@ void print(node head) {
     } else {
         node p = head;
         while (p != nullptr) {
-            cout << p->data << " ";
+            cout << p->x << " ";
             p = p->next;
         }
     }
@@ -179,7 +194,7 @@ node mergeSortedLists(node l1, node l2) {
     if (l1 == nullptr) return l2;
     if (l2 == nullptr) return l1;
 
-    if (l1->data < l2->data) {
+    if (l1->x < l2->x) {
         l1->next = mergeSortedLists(l1->next, l2);
         return l1;
     } else {
@@ -238,14 +253,14 @@ node reverseList(node head) {
 // Eliminate duplicates from a sorted linked list
 void removeDuplicates(node head) {
     if (head == nullptr) return;
-    node current = head;
-    while (current->next != nullptr) {
-        if (current->data == current->next->data) {
-            node temp = current->next;
-            current->next = current->next->next;
+    node curr = head;
+    while (curr->next != nullptr) {
+        if (curr->x == curr->next->x) {
+            node temp = curr->next;
+            curr->next = curr->next->next;
             delete temp; // Free the memory
         } else {
-            current = current->next;
+            curr = curr->next;
         }
     }
 }
@@ -269,7 +284,7 @@ bool isPalindrome(node head) {
 
     node left = head, right = prev;
     while (right != nullptr) {
-        if (left->data != right->data) return false;
+        if (left->x != right->x) return false;
         left = left->next;
         right = right->next;
     }
@@ -283,7 +298,7 @@ void searchNode(node head1, int x) {
 
         cout << "The node value " << x << ": ";
         while (curr != nullptr) {
-            if (curr->data == x) {
+            if (curr->x == x) {
                 found = true;
                 cout << curr << " ";
             }
