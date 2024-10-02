@@ -97,6 +97,7 @@ void removeSong(node& head, string songName) {
 // Display the playlist
 void displayPlaylist(node head) {
     node tmp = head;
+    
     while (tmp != nullptr) {
         cout << tmp->song << " ";
         tmp = tmp->next;
@@ -129,6 +130,7 @@ int main() {
             getline(cin, songName);
             removeSong(head, songName);
         } else if (operation == "DISPLAY") {
+            cout <<"Output: ";
             displayPlaylist(head);
         }
     }
