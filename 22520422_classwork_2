@@ -1,0 +1,391 @@
+//MSSV: 22520422
+//Name: Phạm Thị Minh Hiền
+// Classwork_2
+#include <iostream>
+using namespace std;
+
+class Node {
+public:
+    int x;
+    Node* next;
+    Node* random;
+
+    Node(int x) {
+        x = x;
+        next = nullptr;
+        random = nullptr;
+    }
+};
+
+class LinkedList {
+public:
+    Node* head;
+
+    LinkedList() {
+        head = nullptr;
+    }
+
+    // Insert a new node at the end of the list
+    void insert(int x) {
+        if (x == 0) return;
+        Node* newNode = new Node(x);
+        if (head == nullptr) {
+            head = newNode;
+        } else {
+            Node* curr = head;
+            while (curr->next != nullptr) {
+                curr = curr->next;
+            }
+            curr->next = newNode;
+        }
+    }
+
+    // Print the list, optionally showing random pointers
+    void printList(bool random = false) {
+        Node* curr = head;
+        while (curr) {
+            cout << curr->x;
+            if (random) {
+                if (curr->random) {
+                    cout << ", Random points to: " << curr->random->x;
+                } else {
+                    cout << ", Random points to: nullptr";
+                }
+            }
+            curr = curr->next;
+        }
+        cout << endl;
+    }
+
+    // 1. Add two numbers to the list
+    void addTwoNumbers() {
+        int x1, x2;
+        cout << "Input x1: ";
+        cin >> x1;
+        insert(x1);
+        cout << "Input x2: ";
+        cin >> x2;
+        insert(x2);
+    }
+
+    // 2. Copy List with Random Pointers
+    Node* copyRandomList(Node* head) {
+        if (!head) return nullptr;
+
+        // First pass: create new nodes next to original nodes
+        Node* curr = head;
+        while (curr) {
+            Node* copy = new Node(curr->x);
+            copy->next = curr->next;
+            curr->next = copy;
+            curr = copy->next;
+        }
+
+        // Second pass: set random pointers for new nodes
+        curr = head;
+        while (curr) {
+            if (curr->random) {
+                curr->next->random = curr->random->next;
+            }
+            curr = curr->next->next;
+        }
+
+        // Third pass: restore the original list and separate the copied list
+        curr = head;
+        Node* newHead = head->next;
+        Node* copyCurr = newHead;
+        while (curr) {
+            curr->next = curr->next->next;
+            if (copyCurr->next) {
+                copyCurr->next = copyCurr->next->next;
+            }
+            curr = curr->next;
+            copyCurr = copyCurr->next;
+        }
+
+        return newHead;
+    }
+
+    // Copy the list and return a new LinkedList object with random pointers
+    LinkedList* copyListWithRandom() {
+        LinkedList* copiedList = new LinkedList();
+        copiedList->head = copyRandomList(head);
+        return copiedList;
+    }
+
+    // 3. Swap nodes with x x1 and x2
+    void swapNodes(int x1, int x2) {
+        if (x1 == x2) return;
+
+        Node* prevX1 = nullptr, * currX1 = head;
+        while (currX1 && currX1->x != x1) {
+            prevX1 = currX1;
+            currX1 = currX1->next;
+        }
+
+        Node* prevX2 = nullptr, * currX2 = head;
+        while (currX2 && currX2->x != x2) {
+            prevX2 = currX2;
+            currX2 = currX2->next;
+        }
+
+        if (!currX1 || !currX2) return; // If either node is not found
+
+        // Swap the nodes
+        if (prevX1 != nullptr) {
+            prevX1->next = currX2;
+        } else {
+            head = currX2;
+        }
+
+        if (prevX2 != nullptr) {
+            prevX2->next = currX1;
+        } else {
+            head = currX1;
+        }
+
+        Node* temp = currX1->next;
+        currX1->next = currX2->next;
+        currX2->next = temp;
+    }
+
+    // 4. Remove the N-th node from the end of the list
+    void removeNthFromEnd(int n) {
+        Node* first = head;
+        Node* second = head;
+
+        // Move first pointer n steps ahead
+        for (int i = 0; i < n; i++) {
+            if (first == nullptr) return; // List is shorter than n
+            first = first->next;
+        }
+
+        if (first == nullptr) { // N is the length of the list
+            Node* temp = head;
+            head = head->next;
+            delete temp;
+            return;
+        }
+
+        Node* prev = nullptr;
+        while (first->next != nullptr) {
+            first = first->next;
+            prev = second;
+            second = second->next;
+        }
+
+        // Remove the second pointer (N-th node from end)
+        if (prev != nullptr) {
+            prev->next = second->next;
+        } else {
+            head = second->next;
+        }
+        delete second;
+    }
+
+    // 5. Separate Odd and Even Nodes in a Linked List
+    void separateOddEven() {
+        if (head == nullptr) return;
+
+        Node* odd = nullptr, * even = nullptr;
+        Node* oddTail = nullptr, * evenTail = nullptr;
+        Node* curr = head;
+
+        while (curr) {
+            if (curr->x % 2 != 0) { // Odd
+                if (!odd) {
+                    odd = oddTail = curr;
+                } else {
+                    oddTail->next = curr;
+                    oddTail = oddTail->next;
+                }
+            } else { // Even
+                if (!even) {
+                    even = evenTail = curr;
+                } else {
+                    evenTail->next = curr;
+                    evenTail = evenTail->next;
+                }
+            }
+            curr = curr->next;
+        }
+
+        if (oddTail) oddTail->next = even; // Connect odd list to even list
+        if (evenTail) evenTail->next = nullptr; // Set the end of even list
+
+        head = odd ? odd : even; // Set new head based on availability
+    }
+
+    // 6. Divide a Linked List into Parts
+    void divideParts(int k) { 
+        Node* curr = head;
+        int length = 0;
+
+        while (curr) {
+            length++;
+            curr = curr->next;
+        }
+
+        int partSize = length / k;
+        int remainder = length % k;
+
+        curr = head;
+        for (int i = 0; i < k; ++i) {
+            cout << "Part " << i + 1 << ": ";
+            for (int j = 0; j < partSize + (i < remainder ? 1 : 0); ++j) {
+                if (curr) {
+                    cout << curr->x << " ";
+                    curr = curr->next;
+                }
+            }
+            cout << endl;
+        }
+    }
+
+    // 7. Remove Zero-Sum Consecutive Nodes from a Linked List
+    void removeZeroSum() {
+        Node* curr = head;
+
+        while (curr) {
+            Node* runner = curr;
+            int sum = 0;
+
+            while (runner) {
+                sum += runner->x;
+                if (sum == 0) {
+                    Node* temp = curr;
+                    while (temp != runner) {
+                        Node* nextNode = temp->next;
+                        delete temp;
+                        temp = nextNode;
+                    }
+                    if (curr == head) {
+                        head = runner->next;
+                    }
+                    else {
+                        Node* prev = head;
+                        while (prev->next != curr) {
+                            prev = prev->next;
+                        }
+                        prev->next = runner->next;
+                    }
+                    curr = runner->next;
+                    break;
+                }
+                runner = runner->next;
+            }
+
+            if (runner == nullptr) {
+                curr = curr->next;
+            }
+        }
+    }
+
+    // 8. Input randomly
+    void automaticInput() {
+        srand(time(0));
+        int numberOfEntries = rand() % 21 + 39;
+
+        for (int i = 0; i < numberOfEntries; ++i) {
+            int randomValue = rand() % 199 - 99;
+            insert(randomValue);
+        }
+    }
+};
+
+// Menu
+void menu() {
+    cout << "\nChoose option:\n";
+    cout << "1. Add two numbers to the list\n";
+    cout << "2. Copy list with random pointers\n";
+    cout << "3. Swap two nodes\n";
+    cout << "4. Remove from end\n";
+    cout << "5. Separate odd and even\n";
+    cout << "6. Divide into parts\n";
+    cout << "7. Remove zero-sum consecutive nodes\n";
+    cout << "8. Automatic input\n";
+    cout << "0. Exit\n";
+}
+
+int main() {
+    LinkedList list;
+    int choice, n, x;
+    cout << "== Input List ==" << endl;
+    cout << "Number of nodes: ";  
+    cin >> n;
+    cout << "Input List: ";
+    while (n--) {
+        cin >> x;
+        if (x == 0) { break; }
+        list.insert(x);
+    }
+    cout << "List: ";  
+    list.printList();  
+    cout << endl;
+
+    do {
+        menu();
+        cout << "Choose option: ";
+        cin >> choice;
+
+        switch (choice) {
+        case 1:
+            list.addTwoNumbers();
+            break;
+        case 2: {
+            LinkedList* copiedList = list.copyListWithRandom();
+            cout << "Copied list with random pointers:\n";
+            copiedList->printList(true);
+            delete copiedList;  
+            break;
+        }
+        case 3: {
+            int x1, x2;
+            cout << "Enter two values to swap: ";
+            cin >> x >> x2;
+            list.swapNodes(x1, x2);
+            cout << "List after swapping nodes with values " << x1 << " and " << x2 << ":\n";
+            list.printList();  // In danh sách sau khi swap
+            break;
+        }
+        case 4: {
+            int n;
+            cout << "Enter the position from the end to remove: ";
+            cin >> n;
+            list.removeNthFromEnd(n);
+            cout << "List after removing (from the end):\n";
+            list.printList(); 
+            break;
+        }
+        case 5:
+            list.separateOddEven();
+            cout << "List after separating odd and even:\n";
+            list.printList();
+            break;
+        case 6: {
+            int k;
+            cout << "Enter number of parts: ";
+            cin >> k;
+            list.divideParts(k);
+            break;
+        }
+        case 7:
+            list.removeZeroSum();
+            cout << "List after removing zero-sum consecutive nodes:\n";
+            list.printList();
+            break;
+        case 8:
+            list.automaticInput();
+            cout << "List after automatic input:\n";
+            list.printList();
+            break;
+        case 0:
+            cout << "Exiting...\n";
+            break;
+        default:
+            cout << "Choose 0-8.\n";
+        }
+    } while (choice != 0);
+
+    return 0;
+}
