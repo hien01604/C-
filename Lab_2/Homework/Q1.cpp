@@ -1,3 +1,9 @@
+/*
+MSSV: 22520422
+Phạm Thị Minh Hiền 
+Lab_2 Homework question 1
+*/
+
 #include <iostream>
 using namespace std;
 
